@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "yarn && node index.js",
-    "render": "yarn && node compile.js"
+    "render": "yarn && node render.js"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.17",
