@@ -11,6 +11,8 @@ const callback = function() {
     console.log('done..,')
 }
 
+const ffPromises = []
+
 var walkSync = function(dir, filelist) {
     var fs = fs || require('fs'),
         files = fs.readdirSync(dir);
@@ -24,7 +26,9 @@ var walkSync = function(dir, filelist) {
       else {
         filelist.push(file);
         const fileName = file.replace(/\.mp4/, '')
-        fs.mkdir(`public/streams/${fileName}`, (err) => {
+
+        ffPromises.push(new Promise((resolve) => {
+          fs.mkdir(`public/streams/${fileName}`, (err) => {
             ffmpeg(`public/sources/${file}`, { timeout: 432000 }).addOptions([
                 '-profile:v baseline', // baseline profile (level 3.0) for H264 video codec
                 '-level 3.0', 
@@ -33,18 +37,24 @@ var walkSync = function(dir, filelist) {
                 '-hls_list_size 0',    // Maxmimum number of playlist entries (0 means all entries/infinite)
                 '-f hls'               // HLS format
               ]).output(`public/streams/${fileName}/${fileName}.m3u8`).on('end', () => {
-                  console.log('Hls vision complete:'.green)
-                  console.log(`\thttp://127.0.0.1:8000/public/streams/${fileName}/${fileName}.m3u8`.red)
-                  process.exit()
+                  console.log('🚛 Hls compilation complete:'.green)
+                  console.log(`✅\thttp://127.0.0.1:8000/public/streams/${fileName}/${fileName}.m3u8`.red)
+                  resolve();
               }).run()
-        })
+            })
+        }))
       }
     });
     return filelist;
   };
 
 console.clear()
-console.log('in progress...'.blue)
+console.log('👨\tIn progress...'.blue)
 walkSync('./public/sources', [])
+
+Promise.all(ffPromises).then(() => {
+  console.log('😎 All videos was successful converted\n\n\n'.green)
+  process.exit()
+})
 
 
