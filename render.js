@@ -23,24 +23,28 @@ var walkSync = function(dir, filelist) {
       }
       else {
         filelist.push(file);
-
-        ffmpeg(`public/source/${file}`, { timeout: 432000 }).addOptions([
-            '-profile:v baseline', // baseline profile (level 3.0) for H264 video codec
-            '-level 3.0', 
-            '-start_number 0',     // start the first .ts segment at index 0
-            '-hls_time 10',        // 10 second segment duration
-            '-hls_list_size 0',    // Maxmimum number of playlist entries (0 means all entries/infinite)
-            '-f hls'               // HLS format
-          ]).output(`public/streams/${file.replace(/\.mp4/, '')}.m3u8`).on('end', () => {
-              console.log('Playlists status: well done.'.green)
-              process.exit()
-          }).run()
-          
+        const fileName = file.replace(/\.mp4/, '')
+        fs.mkdir(`public/streams/${fileName}`, (err) => {
+            ffmpeg(`public/sources/${file}`, { timeout: 432000 }).addOptions([
+                '-profile:v baseline', // baseline profile (level 3.0) for H264 video codec
+                '-level 3.0', 
+                '-start_number 0',     // start the first .ts segment at index 0
+                '-hls_time 10',        // 10 second segment duration
+                '-hls_list_size 0',    // Maxmimum number of playlist entries (0 means all entries/infinite)
+                '-f hls'               // HLS format
+              ]).output(`public/streams/${fileName}/${fileName}.m3u8`).on('end', () => {
+                  console.log('Hls vision complete:'.green)
+                  console.log(`\thttp://127.0.0.1:8000/public/streams/${fileName}/${fileName}.m3u8`.red)
+                  process.exit()
+              }).run()
+        })
       }
     });
     return filelist;
   };
 
-walkSync('./public/source', [])
+console.clear()
+console.log('in progress...'.blue)
+walkSync('./public/sources', [])
 
 
