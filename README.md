@@ -7,4 +7,4 @@ HLS video stream server + ffmpeg converter
 
 `yarn render` - render all source videos(.mp4) from `public/source/`
 
-All compiled videos has saved at `public/streams/`
+>All compiled videos will be saved at `public/streams/`
