@@ -1,11 +1,12 @@
-var HLSServer = require('hls-server')
-var http = require('http')
-var color = require('colors')
- 
-var server = http.createServer()
-var hls = new HLSServer(server, {
-  path: '/streams',     // Base URI to output HLS streams
-  dir: 'public'  // Directory that input files are stored
+const express = require('express');
+const cors = require('cors');
+const colors = require('colors');
+
+const app = express();
+app.use(cors());
+app.use('/public', express.static(__dirname + '/public'));
+
+app.listen(8000, () => {
+  console.clear();
+  console.log('UCHi.RU: strated at 127.0.0.1:8000'.blue);
 })
-server.listen(8000)
-console.log("127.0.0.1:8000 port is worked as Stream Server".blue);
